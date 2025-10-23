@@ -8,6 +8,7 @@ This script uses geopy to fetch latitude, longitude, and type for a list of loca
 
 from geopy.geocoders import Nominatim
 import pandas as pd
+import time
 
 def get_geolocator(agent='h501-student'):
     """
@@ -67,8 +68,11 @@ def build_geo_dataframe(geolocator, locations):
     pd.DataFrame
         DataFrame with columns: location, latitude, longitude, type.
     """
-    # Fetch geocoded data for each location
-    geo_data = [fetch_location_data(geolocator, loc) for loc in locations]
+    # Fetch geocoded data for each location with delay to respect rate limits
+    geo_data = []
+    for loc in locations:
+        geo_data.append(fetch_location_data(geolocator, loc))
+        time.sleep(1)  # Delay 1 second between requests to avoid rate limits
     return pd.DataFrame(geo_data)
 
 
